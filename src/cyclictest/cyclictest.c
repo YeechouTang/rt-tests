@@ -1358,8 +1358,8 @@ static void process_options (int argc, char *argv[], int max_cpus)
 		case 'p':
 		case OPT_PRIORITY:
 			priority = atoi(optarg);
-			if (policy != SCHED_FIFO && policy != SCHED_RR)
-				policy = SCHED_FIFO;
+	    //	if (policy != SCHED_FIFO && policy != SCHED_RR)
+		//		policy = SCHED_FIFO;
 			break;
 		case 'q':
 		case OPT_QUIET:
@@ -1522,12 +1522,12 @@ static void process_options (int argc, char *argv[], int max_cpus)
 			num_threads+1);
 		priority = num_threads+1;
 	}
-
+/*
 	if (priority && (policy != SCHED_FIFO && policy != SCHED_RR)) {
 		fprintf(stderr, "policy and priority don't match: setting policy to SCHED_FIFO\n");
 		policy = SCHED_FIFO;
 	}
-
+*/
 	if ((policy == SCHED_FIFO || policy == SCHED_RR) && priority == 0) {
 		fprintf(stderr, "defaulting realtime priority to %d\n",
 			num_threads+1);
