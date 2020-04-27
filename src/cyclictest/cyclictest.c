@@ -673,10 +673,17 @@ static void *timerthread(void *param)
 	}
 
 	memset(&schedp, 0, sizeof(schedp));
-	schedp.sched_priority = par->prio;
-	if (setscheduler(0, par->policy, &schedp))
-		fatal("timerthread%d: failed to set priority to %d\n",
-		      par->cpu, par->prio);
+	if (par->policy == SCHED_FIFO || par->policy == SCHED_RR) {
+		schedp.sched_priority = par->prio;
+		if (setscheduler(0, par->policy, &schedp)) {
+			fatal("timerthread%d: failed to set priority to %d\n",
+				par->cpu, par->prio);
+		}
+	}
+
+	if (par->policy == SCHED_OTHER) {
+		nice(par->prio);
+	}
 
 	if(smi) {
 		par->msr_fd = open_msr_file(par->cpu);
@@ -1528,10 +1535,19 @@ static void process_options (int argc, char *argv[], int max_cpus)
 		policy = SCHED_FIFO;
 	}
 */
-	if ((policy == SCHED_FIFO || policy == SCHED_RR) && priority == 0) {
-		fprintf(stderr, "defaulting realtime priority to %d\n",
-			num_threads+1);
-		priority = num_threads+1;
+	if (policy == SCHED_FIFO || policy == SCHED_RR) {
+		if (priority <= 0 || priority > 99) {
+			fprintf(stderr, "defaulting realtime priority to %d\n",
+				num_threads+1);
+			priority = num_threads+1;
+		}
+	}
+
+	if (policy == SCHED_OTHER) {
+		if (priority < -20 || priority > 19) {
+			fprintf(stderr, "defaulting CFS nice value to %d\n", 0);
+			priority = 0;
+		}
 	}
 
 	if (num_threads < 1)
