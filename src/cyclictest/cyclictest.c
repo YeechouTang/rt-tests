@@ -1674,10 +1674,23 @@ static void print_hist(struct thread_param *par[], int nthreads)
 		fprintf(fd, " %05lu", par[j]->stats->min);
 	fprintf(fd, "\n");
 	fprintf(fd, "# Avg Latencies:");
-	for (j = 0; j < nthreads; j++)
-		fprintf(fd, " %05lu", par[j]->stats->cycles ?
-		       (long)(par[j]->stats->avg/par[j]->stats->cycles) : 0);
+	long max_avg_latency = 0;
+	long avg_latency;
+	for (j = 0; j < nthreads; j++) {
+		if (par[j]->stats->cycles != 0) {
+			avg_latency = par[j]->stats->avg/par[j]->stats->cycles;
+			if (avg_latency > max_avg_latency) {
+				max_avg_latency = avg_latency;
+			} else{
+				avg_latency = 0;
+			}
+			fprintf(fd, " %05lu", avg_latency);
+		}
+		// fprintf(fd, " %05lu",  ?
+		//        (long)(par[j]->stats->avg/par[j]->stats->cycles) : 0);
+	}
 	fprintf(fd, "\n");
+	fprintf(fd, "# Max value of Avg Latency: %05lu\n", max_avg_latency);
 	fprintf(fd, "# Max Latencies:");
 	maxmax = 0;
 	for (j = 0; j < nthreads; j++) {
