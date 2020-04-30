@@ -1701,6 +1701,7 @@ static void print_hist(struct thread_param *par[], int nthreads)
 	if (histofall && nthreads > 1)
 		fprintf(fd, " %05lu", maxmax);
 	fprintf(fd, "\n");
+	fprintf(fd, "# Max value of Max Latency: %05lu\n", maxmax);
 	fprintf(fd, "# Histogram Overflows:");
 	alloverflows = 0;
 	for (j = 0; j < nthreads; j++) {
